@@ -23,6 +23,7 @@ def MessageView(request, room_name, username):
         
     messages = Message.objects.filter(room=room)   
     context = {
+        'room': room_name,
         "messages": messages,
         "user": username,
     } 

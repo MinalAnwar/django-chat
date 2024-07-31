@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
+<style>
+    .form-control:focus {
+        border:none;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+</style>
 <body class="bg-light">
     <div class="d-flex justify-content-center align-items-center min-vh-100">
         <div class="container">
@@ -18,7 +24,7 @@
                             <h2>Chat</h2>
                         </div>
                         <div class="card-body">
-                            <div class="chat-body mb-3" id="tasks" style="max-height: 400px; overflow-y: auto;">
+                            <div class="chat-body mb-3" id="chatContainer" style="max-height: 400px; overflow-y: auto;">
                                 {% for i in messages %}
                                     {% if i.sender != user %}
                                         <div class="message mb-2">
@@ -39,7 +45,7 @@
                         <div class="card-footer">
                             <form action="" id="message" method="POST">
                                 {% csrf_token %}
-                                <div class="form-group">
+                                <div class="form-group message">
                                     <textarea id="msg" class="form-control" name="message" rows="3" placeholder="Enter your message" required></textarea>
                                 </div>
                                 <button id="send" class="btn btn-success btn-block" type="submit">Send</button>
@@ -52,10 +58,71 @@
     </div>
 </body>
 <script>
+    const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsEndpoint = `${websocketProtocol}://${window.location.host}/ws/notification/{{room}}/`;
+    const socket = new WebSocket(wsEndpoint);
+    
+    socket.onopen = (event) => {
+        console.log("WebSocket connection opened!");
+    };
+
+    socket.onclose = (event) => {
+        console.log("WebSocket connection closed!");
+    };
+
+    document.getElementById('message').addEventListener('submit', function(event){
+        event.preventDefault();
+        const message = document.getElementById('msg').value;
+        socket.send(
+            JSON.stringify({
+                'message': message,
+                'room_name': '{{room}}',
+                'sender': '{{user}}'
+            })
+        );
+    })
+
     document.querySelector('#msg').onkeyup = function(e) {
         if (e.keyCode === 13) {
             document.querySelector('#send').click();
         }
     };
+
+    function scrollToBottom() {
+        var chatContainer = document.getElementById("chatContainer");
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    socket.addEventListener("message", (event) => {
+        const messageData = JSON.parse(event.data)['message'];
+        console.log(messageData);
+
+        var sender = messageData['sender'];
+        var message = messageData['message'];
+
+        if (sender == '{{user}}'){
+            document.getElementById('msg').value = '';
+        }
+
+        var messageDiv = document.querySelector('#chatContainer');
+        if (sender != '{{user}}') {
+            messageDiv.innerHTML += `
+                <div class="message mb-2">
+                    <div class="alert alert-light p-2 px-4">
+                        <p class="mb-0 text-dark">${message} <strong>-${sender}</strong></p>
+                    </div>
+                </div>
+            `;
+        } else { 
+            messageDiv.innerHTML += `
+                <div class="message mb-2 text-right">
+                    <div class="alert alert-success text-dark p-2 px-4">
+                        <p class="mb-0">${message}</p>
+                    </div>
+                </div>
+            `;
+        }
+        scrollToBottom();
+    });
 </script>
 </html>
