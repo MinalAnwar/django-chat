@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body class="bg-light">
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card">
+                        <div class="card-header text-center bg-success text-white">
+                            <h2>Chat</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chat-body mb-3" id="tasks" style="max-height: 400px; overflow-y: auto;">
+                                {% for i in messages %}
+                                    {% if i.sender != user %}
+                                        <div class="message mb-2">
+                                            <div class="alert alert-light p-2 px-4">
+                                                <p class="mb-0 text-dark">{{i.message}} <strong>-{{i.sender}}</strong></p>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="message mb-2 text-right">
+                                            <div class="alert alert-success text-dark p-2 px-4">
+                                                <p class="mb-0">{{i.message}}</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <form action="" id="message" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <textarea id="msg" class="form-control" name="message" rows="3" placeholder="Enter your message" required></textarea>
+                                </div>
+                                <button id="send" class="btn btn-success btn-block" type="submit">Send</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    document.querySelector('#msg').onkeyup = function(e) {
+        if (e.keyCode === 13) {
+            document.querySelector('#send').click();
+        }
+    };
+</script>
+</html>

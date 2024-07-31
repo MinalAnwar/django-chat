@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Rooms</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    .form-control:focus {
+        border:none;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+</style>
+<body>
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="w-100" style="max-width: 500px;">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Enter Chat Room</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input id="username" name="username" type="text" class="form-control" placeholder="Enter Username">
+                        </div>
+                        <div class="form-group">
+                            <label for="room">Chat Room Name</label>
+                            <input id="room" name="room" type="text" class="form-control" placeholder="Enter room name">
+                        </div>
+                        <button id="room-name-submit" type="submit" class="btn btn-success btn-block">Enter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.querySelector('#room-').focus();
+        document.querySelector('#room').onkeyup = function(e) {
+            if (e.keyCode === 13) {
+                document.querySelector('#room-name-submit').click();
+            }
+        };
+    </script>
+</body>
+</html>
